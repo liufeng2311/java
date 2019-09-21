@@ -1,0 +1,383 @@
+1.ls命令(查看文件包含的内容)
+	ls                 列出该文件夹的非隐藏目录
+	ls -a              列出该文件夹的目录(包含隐藏文件)
+	ls -A              列出该文件夹中除了.和..以外的其他文件目录
+	ls -t              按文件的修改时间排序
+	ls -S              按文件的大小排序(默认降序)
+	ls -r              反序排列
+	ls -l              列出文件的详细信息
+    ===================================================================	
+	ll等价于ls -alF    查看ll命令       alias ll  --->alias ll='ls -alF
+    ls -参数 过滤条件  查找该目录下包含该字符串的文件
+	ls -l Pictu*       列出以Pictu开头的文件
+
+2.cd命令(切换文件目录)
+	cd                 进入本目录
+	cd ..              返回上层目录
+	cd /               返回跟目录
+	cd ~               返回家目录
+	cd -               返回上级目录并输出pwd
+	===================================================================
+	cd 文件名          在本层路径下查找该文件(相对文件查找)
+	cd home            进入该路径下的home文件
+	cd 文件路径        按指定的路径查找(绝对路径查找)
+	cd ../home         查找上级目录的home文件
+	cd /home           查找根目录下的home文件
+	cd liufeng/home    查找该目录下liufeng目录下的home文件
+	
+3.pwd命令(输出该文件的绝对路径)
+	pwd                显示该文件的绝对路径
+	pwd -P             显示软链接的实际路径(软链接相当于windows的快捷方式)
+	
+4.mkdir命令(创建文件夹,默认只能创建单级文件夹)
+	mkdir file         在当前目录创建file文件
+	mkdir -p           创建多级文件夹时,中间层不存在，则创建
+	mkdir -p 1/2/3     不加-p时无法创建多级文件夹加上-p则可以
+	
+5.rmdir命令(删除文件夹,必须含有对父目录的写权限)
+	rmdir filename      删除该文件夹，前提必须是该文夹为空
+	rmdir -p 1/2        删除2文件,如果2删除后1位空文件夹,咋会删除1文件夹
+	rmdir 1/2           只会删除2文件夹
+	
+6.rm命令(删除文件或者文件夹)
+	rm -d               删除可能仍有数据的目录 (只限超级用户)
+    rm -f               略过不存在的文件，不显示任何信息，强制删除
+    rm -i               进行任何删除操作前必须先确认
+    rm -r               同时删除该目录下的所有目录层
+	===================================================================
+	rm -i  *.log        删除以log结尾的文件,每次删除多要确认 
+	rm -rf test         删除test下所有文件,每次删除不需要确认(test文件也会会删除)
+	rm --  filename     删除该文件(此处是文件)
+	
+7.mv命令(移动文件或修改文件名)(根据第二参数类型,如目录，则移动文件；如为文件则重命令该文件)
+	mv -i test.log test1.txt      重命名，如test1.txt以存在，咋提示
+	mv log3.txt /test3            将log3.txt移动到test3下
+	
+8.cp命令(复制命令)
+    cp -a a.txt test      复制该文件到test下，源文件依旧存在
+	cp -a a.txt test      复制的文件和源文件的时间一样
+	cp -r a.txt test      复制目录及目录内所有项目
+	
+9.用户组权限命令(groupadd: cannot lock /etc/group; try again later)
+	===============================用户组====================================
+	groupadd groups                              添加用户组groups
+	groupdel groups                              删除用户组groups
+	groupmod -n newgroup groups                  重命名groups为newgroup
+	groups   userName                            查看用户属于哪个组,不加user时表示当前用户
+	id       userName                            查看用户信息,不加user时表示当前用户
+	cat /etc/group|grep liufeng                  在/etc/group文件中查找
+	===============================用户====================================
+	useradd liufeng                              创建用户liufeng，且组名也是liufeng
+	su liufeng                                   切换至新创建的用户liufeng
+	passwd                                       修改密码，管理员可以修改任意用户密码，普通用户只能修改自己的密码
+	passwd username                              root创建的用户是没有密码的，使用该命令设置密码
+	usermod -d /home/liufeng liufeng             修改用户liufeng登录系统的初始目录
+	usermod -g liufeng 123                       修改用户123所在的组为liufeng
+	useradd -g liufeng 1234                      新增用户1234并制定用户组liufeng
+	userdel username                             删除用户
+	===============================用户权限====================================
+	通过将用户加入已有的组获取该组的权限
+	===============================文件权限====================================
+	linux的文件信息如下
+	drwxr-xr-x  2 liufeng liufeng 4096 5月  28 13:43 wangjing/
+	drwxr-xr-x表示权限，共有十位
+	第一位表示文件的类型(-表示文件,d表示文件夹,l表示链接)
+	其余九位表示文件的权限,三个为一组，分别代表当前用户、用户所在的组、其他人对该文件的权限(r表示可读,w表示可写,x表示可执行)(rwx也可以用数字表示r=4,w=2,x=1) rwx=7
+    2                        表示文件的链接数(不懂)
+	liufeng                  表示用户
+	liufeng                  表示组
+	4096 5月  28 13:43       表示创建时间
+	wangjing/                表示文件名
+	===============================chmod====================================
+	chmod 改变文件或目录的权限
+    chmod 755 abc def            赋予abc和def权限rwxr-xr-x,可同时为多个文件赋值
+	chmod -R 755 abc             赋予abc以及子目录文件的权限为rwxr-xr-x,-R表示递归修改
+    chmod u=rwx,g=rx,o=rx abc    同上u=用户权限，g=组权限，o=不同组其他用户权限(此处不可用数字代替权限)
+    chmod u-x,g+w abc            给abc去除用户执行的权限，增加组写的权限
+    chmod a+r abc                给所有用户添加读的权限
+	===============================chown====================================
+	chown 改变文件或目录所属的用户
+	chown xiaoming abc             改变abc的所有者为xiaoming
+	chown xiaoming:liufeng abc     改变abc的所有者为xiaoming,所属组为liufeng
+	chown -R xiaoming *            改变当前目录下文件的所有者为xiaoming   -R 递归
+	chown -R xiaoming:liufeng *    改变当前目录下文件的所有者为xiaoming,所属组为liufeng  -R 递归
+	===============================chgrp====================================
+	chgrp 改变文件或目录的所属组
+	chgrp root abc                 改变abc所属的组为root
+	===============================其他命令====================================
+	whoami                查看当前登录者  
+10.sudo命令(/etc/sudoers) 赋予其他用户管理员的某些权限
+	我们在/etc/sudoers文件中配置哪些用户可以使用sudo命令
+	root       ALL=(ALL:ALL) ALL                              配置用户,格式:  user where=(user:group) command
+	%sudo      ALL=(ALL:ALL) ALL                              配置组,格式:  %group where=(user:group) command
+	%liufeng   ALL=(ALL) NOPASSWD: ALL                       配置组,使用sudo命令时不需要输入密码,格式:  %group where=(user:group) NOPASSWD:command
+	参数解释
+	第一个参数表示的是用户名或者组名
+	第二个参数ALL=(ALL:ALL)或者ALL=(ALL),第一个ALL指定登录的IP,ALL表示所有IP都可以使用该命令,(ALL:ALL)表示(user:group),即登录者切换至某一组的某个用户
+	第三个参数ALL表示可以执行哪些命令
+	===============================编辑/etc/sudoers====================================
+	使用visudo命令编辑该文件
+	Ctrl+O 保存    Ctrl+X  退出
+11.whereis命令(只能用于程序名的搜索)
+	whereis locate                               搜索有关locate命令的文件
+	whereis -b locate                            搜索有关locate命令可执行文件
+	whereis -m locate                            搜索有关locate命令的帮助文件
+	whereis -s locate                            搜索有关locate命令源代码的文件
+	whereis -u locate                            搜索有关locate除上述之外的文件
+12.which命令(用于查找PATH中的命令,使用$PATH查看)
+	which ls                                     查看ls命令的位置
+	which cd                                     cd不是PATH中的命令，所以查不出来
+13.tail命令(查看文件末尾内容)
+    tail  filename      查看后10行日志文件
+	tail -f filename    查看日志文件
+	tail -n filename    显示行数(n表示后多少行)
+	tail +n filename    显示第n行到结尾的数据(n表示先后后多少行)
+14.head命令(查看文件开头内容)
+    head  filename             查看前10行日志文件
+	head  filename -n 20       查看文件前十行
+	head -n 20 filename       查看文件后十行
+	
+	
+	
+	
+	
+************************************************************************************
+****                                                                            ****
+****                               管道符|和xargs的区别                         ****
+****                                                                            ****
+************************************************************************************	
+1.|的作用是将左边的标准输出导入到右边的标准输入，此时如果右边不指定目标文件的话,则将标准输入作为目标文件，否则使用指定的目标文件
+	cat  filename | grep  pattern	                   从左侧输出中过滤
+	cat  filename | grep  pattern newfilename          从新文件中过滤,与左侧无关
+2.我们可以设置既读取标准输入,又读取指定的目标文件
+	cat  filename | grep  pattern	newfilename -      先从新文件中查找,再从左侧输出中查找
+	cat  filename | grep  pattern	- newfilename      先从左侧输出中查找,再从新文件中查找
+3.cat和grep是可以读取标准输出的,但是很多命令不接受标准输入,比如kill、rm等,他们只接受命令行参数,此时就需要用到xargs
+	ps aux | grep java | grep tc-client | grep -v grep | awk '{print $2}'| xargs kill -9 
+	ps aux | grep java | grep tc-client | grep -v grep | awk '{print $2}'  表示打印出tc-client服务的ID
+	xargs kill -9 表示把前面服务的ID作为kill -9 的命令行参数
+	awk '{print $2}' 表示将标准输入按照空格分隔，并取第二个元素($2表示第二个)
+4.xargs的作用
+	xargs 是将|左侧的标准输入作为命令行参数拼接到右侧语句的后面，而不是作为标准输入
+
+	
+	
+************************************************************************************
+****                                                                            ****
+****                                   vim命令                                  ****
+****                                                                            ****
+************************************************************************************	
+1.	
+	
+	
+	
+	
+	
+	
+************************************************************************************
+****                                                                            ****
+****                          日志相关命令                                      ****
+****                                                                            ****
+************************************************************************************
+
+1.使用grep命令搜索指定的文本内容,格式如下(先搜索,再过滤)
+  cat  filename | grep pattern                                     |前表示源目标,即我们需要从哪里搜索;|后表示过滤条件,即我们需要搜索哪个pattern，并规定如何显示
+  
+  cat  filename | grep  pattern                        显示filename中存在pattern的行
+  cat  filename | grep  -n        pattern              显示filename中存在pattern的行,并显示行号
+  cat  filename | grep  -A1000    pattern              显示filename中存在pattern的后100行的数据,A表示AFTER
+  cat  filename | grep  -B1000    pattern              显示filename中存在pattern的前100行的数据,B表示BEFORE
+  cat  filename | grep  -C1000    pattern              显示filename中存在pattern的前后100行的数据,C表示CROSS
+  cat表示全文件搜索,我们可以缩小搜索的范围,如使用tail、head等
+  tail -100  filename | grep  pattern                  显示filename后100行中存在pattern的行
+2.使用grep命令搜索指定的文本内容,格式如下(先过滤,再搜索)
+  grep -n pattern filename | tail -(n+1)               搜索该字符出现最后一次后n行的内容 ,tail中要显示的是n+1行，而不是n，否则匹配行不显示
+3.grep命令(强大的文本搜索命令)
+  grep -参数 pattern filename|dir                        grep 参数   需要搜寻的内容    需要从哪个文件搜索
+  grep  -E 'pattern1|pattern2' filename                  查找满足a或者b的内容
+  egrep 'pattern1|pattern2' filename                     查找满足a或者b的内容
+  grep  pattern1 files | grep pattern2                   显示既匹配 pattern1 又匹配 pattern2 的行，即可以通过|多次过滤
+  grep -c pattern filename                               统计该字符出现的次数，其他参数将不起作用
+  grep -i pattern filename                               忽略关键字的大小写
+  
+  
+  
+  
+  
+  
+  
+  
+************************************************************************************
+****                                                                            ****
+****                          服务相关命令                                      ****
+****                                                                            ****
+************************************************************************************
+
+1.使用ps命令来查看进程
+	ps -ef                                              查看所有进程,该命令也是一条进程,会显示在列表中
+	ps aux                                              查看所有进程,与ps -ef不同的是显示格式不同
+	ps -ef |grep -v grep  或者 ps aux |grep -v grep     查看所有进程,该命令也是一条进程,通过grep -v grep 过滤掉这个进程,即不显示该查找进程
+2.ps -ef 结果列表字段解释
+	
+  UID                 进程持有者
+  PID                 进程ID
+  PPID                进程父ID
+  C                   CPU使用的资源百分比
+  STIME               进程启动时间
+  TTY                 登入者的终端机位置
+  TIME                进程使用掉的CPU时间
+  CMD                 所下达的指令
+3.查看端口占用情况
+  ===============================ss====================================
+  ss  -tnlp | grep :22                 查看22端口的情况,grep加不加引号都可以
+  ss  -tnlp | grep ssh                 查看ssh服务占用情况
+  ===============================netstat===============================
+  netstat  -tnlp | grep :22            查看22端口的情况,grep加不加引号都可以
+  netstat  -tnlp | grep ssh            查看ssh服务占用情况
+  ===============================lsof===============================
+  lsof -i :22                          查看22端口的情况
+  ===============================fuser===============================
+  fuser -v 22/tcp                      查看22端口的情况
+  
+
+
+************************************************************************************
+****                                                                            ****
+****                              防火墙                                        ****
+****                                                                            ****
+************************************************************************************
+1.CentOS7中使用firewall作为防火墙(由管理员权限操作,可以省略.service)
+	firewall-cmd --state                          查看防火墙的状态
+	systemctl status firewalld.service            同上
+	firewall-cmd --relaod                         重启防火墙
+	systemctl reload firewalld.service            同上
+	systemctl stop firewalld.service              关闭防火墙
+	systemctl start firewalld.service             启动防火墙
+	systemctl disable firewalld.service           禁止开机自启
+	systemctl enable firewalld.service            设置开机自启
+2.查看服务器端口开放情况
+	方式一：
+	1.yum install nmap       安装nmap
+	2.nmap localhost         列出开放端口列表
+	方式二：
+	1.iptables-save          查看-A IN_public_allow -p tcp -m tcp --dport开头的列,位于输出的最后
+	方式三：
+	1.firewall-cmd --list-ports     显示我们自己开发的端口
+3.开放端口和关闭端口(开放和关闭端口都必须重新加载防火墙才生效firewall-cmd --relaod)
+	开放端口：
+	其中permanent表示永久生效，public表示作用域，80/tcp表示端口和类型
+	firewall-cmd --zone=public --add-port=80/tcp --permanent
+	关闭端口：
+	firewall-cmd --permanent --zone=public --remove-port=80/tcp
+	添加网卡至指定zone
+	firewall-cmd --zone=public --add-interface=ens33
+	移除网卡至指定zone
+	firewall-cmd --zone=public --remove-interface=ens33
+4.
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+************************************************************************************
+****                                                                            ****
+****                          起停服务shell解读                                 ****
+****                                                                            ****
+************************************************************************************  
+  
+#!/bin/bash                           表示使用的bash
+
+set -x                                设置输出,即一会执行的命令都会在控制台输出,  +X表示不输出
+
+project=${1:-""}                      ${1}表示第一个参数,${1:-""}表示第一个参数为空的话,默认值为""
+action=${2:-""}
+dir=heilongjiang/backend-service/$project   $project引用定义好的变量
+
+start() {                                    定义函数
+    JAVA_MEM_OPTS=" -server -Xms256m -Xmx512m -Xmn256m -Xss256k"
+    nohup /usr/local/java/jdk1.8.0_211/bin/java $JAVA_MEM_OPTS -jar /data/$dir/$project-1.0-SNAPSHOT.jar > /data/$dir/$project.log 2>&1 &
+    sleep 2
+    tail -f $project.log
+}
+
+stop() {
+    ps aux | grep java | grep $dir | grep -v grep | awk '{print $2}'| xargs kill -9 && echo "stop sucess" || echo "already stop"
+}
+
+case $action in                                     
+    start   )
+            start                                调用函数
+            ;;
+    stop    )
+            stop
+            exit 0
+            ;;
+    *       )                                     *表示其他
+            echo "Usage: $0 {start|stop}"
+            exit 2                                2表示退出时反馈的信息
+            ;;
+esac

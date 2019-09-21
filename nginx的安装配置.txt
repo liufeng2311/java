@@ -1,0 +1,213 @@
+************************************************
+*** 使用版本  Linux CentOS 7   nginx  1.17.3 ***
+************************************************
+
+
+************************************************
+***                 环境安装                 ***
+************************************************
+1.安装nginx必要的环境
+	yum -y install gcc zlib zlib-devel pcre-devel openssl openssl-devel
+2.解压nginx压缩包
+	tar -xvf nginx-1.17.3.tar.gz
+3.编译安装nginx(在解压后的目录中执行),
+	./configure && make && make install
+4.安装后会在usr/local目录下生成nginx目录,启动nginx(/usr/local/nginx/sbin目录下)
+	.nginx                启动nginx服务
+	.nginx -h             获取帮助
+	.nginx -t             验证配置文件状态
+	.nginx -s stop        关闭nginx服务
+	.nginx -s reload      重新加载配置文件(重启)
+	
+************************************************
+***                 端口设置                 ***
+************************************************
+1.打开80端口,使外网可以访问(firewall-cmd是操作防火墙的命令)
+	firewall-cmd --zone*public --add-interface*ens              将ens这个网卡添加到public这个zone中
+	firewall-cmd --zone*public --add-port*80/tcp                将public这个zone中添加80端口
+	firewall-cmd reload                                         重启防火墙,使配置生效
+
+************************************************
+***               hosts文件修改              ***
+************************************************
+1.hosts文件的作用
+	hosts文件的作用是域名解析,当我们通过域名请求网址时,会先通过本机的hosts文件查看是否有对应的IP,
+	没有的话再通过请求DNS域名解析服务器查找对应的IP
+2.hosts文件的修改(该文件需要用管理员身份修改)
+	windows10版
+	位置            C:\Windows\System32\drivers\etc\hosts
+	管理员cmd       notepad    C:\Windows\System32\drivers\etc\hosts   添加域名和IP对应关系,保存
+	
+
+************************************************
+***             nginx.conf解读               ***
+************************************************
+1.nginx.conf配置文件解读
+user root root;                                                   //设置运行时的的用户和用户组,我们设置为root,运行过程中会以指定的用户权限去访问
+worker_processes  1;                                              //设置工作进程数,默认值为1,此时nginx会启动一个主线程和一个工作线程,主线程负责调度工作线程,默认1即可,非要改的话,改为cpu数
+
+#error_log  logs/error.log;                                       //设置日志输出,可以指定输出的日志级别
+#error_log  logs/error.log  notice;
+#error_log  logs/error.log  info;
+
+#pid        logs/nginx.pid;                                       //将nginx主线程的pid存在至logs/nginx.pid中
+
+
+events {
+    worker_connections  1024;                                     //每个工作线程最大连接数,如果工作线程为1,最大连接为1024,则第1025个连接将被拒绝
+}
+
+
+http {
+    include       mime.types;                                     //引入mime.types文件,里面常见的数据类型
+    default_type  application/octet-stream;                       //如果不在上述的类型中,使用二进制类型
+
+    #log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '    //定义日志输出的类型,用main引用
+    #                  '$status $body_bytes_sent "$http_referer" '
+    #                  '"$http_user_agent" "$http_x_forwarded_for"';
+
+    #access_log  logs/access.log  main;                               //使用main格式输出日志到指定位置
+
+    sendfile        on;                                                //允许sendfile方式传输文件，默认为off,高效传输
+	sendfile_max_chunk 100k;                                           //每个进程每次调用传输数量不能大于设定的值，默认为0，即不设上限。
+    #tcp_nopush     on;
+
+    keepalive_timeout  65;                                             //连接超时时长
+
+    #gzip  on;                                                         //压缩功能
+	
+	upstream mysvr {                                                   //设置mysvr的负载均衡
+      server 127.0.0.1:7878;
+      server 192.168.10.121:3333;
+    }
+
+    server {
+        listen       80;                                               //监听80端口
+        server_name  localhost;
+
+        charset utf-8;                                                 //设置字符集
+
+        access_log  logs/host.access.log  main;                        //定义日志位置
+
+        location / {                                                   //详解见下
+            root   html;
+            index  index.html index.htm;
+        }
+
+        error_page  404              /404.html;                        //定义错误页
+
+        error_page   500 502 503 504  /50x.html;                       //定义错误页
+        location = /50x.html {                                         //详解见下
+            root   html;
+        }
+
+        location ~ ^php$ {                                            //路径映射,正则匹配，~为区分大小写，~*为不区分大小写                        
+            proxy_pass   mysvr;                                        //将匹配的连接转发至mysvr,没有负载均衡的话直接写IP
+			deny 127.0.0.1;                                            //拒绝的ip，all表示禁止所有
+            allow 172.18.5.54;                                         //允许的ip
+        }
+        
+        location ~ /\.ht {                                             //详解如下
+            deny  all;
+        }
+    }
+
+
+    # HTTPS server                                                 //监听443端口
+    #
+    #server {
+    #    listen       443 ssl;
+    #    server_name  localhost;
+
+    #    ssl_certificate      cert.pem;
+    #    ssl_certificate_key  cert.key;
+
+    #    ssl_session_cache    shared:SSL:1m;
+    #    ssl_session_timeout  5m;
+
+    #    ssl_ciphers  HIGH:!aNULL:!MD5;
+    #    ssl_prefer_server_ciphers  on;
+
+    #    location / {
+    #        root   html;
+    #        index  index.html index.htm;
+    #    }
+    #}
+
+}
+
+
+************************************************
+***             location配置详解             ***
+************************************************	
+1. 域名直接访问配置
+	匹配静态文件设置
+        location / {                                                   当直接通过server_name访问时被此拦截
+            root   html;                     绝对路径=root/location                            root表示该请求映射到服务器的路径,可以是绝对路径,也可以是相对路径(相对于/usr/local/nginx/)
+            index  index.html index.htm;                               如果相对路径下存在index.html,则再次请求server_name/index.html,不存在则匹配index.htm
+        }
+	匹配动态文件设置
+	location = / {
+    proxy_pass http://tomcat:8080/index
+		}
+2.location语法
+语法:	location [=|~|~*|^~] /uri/ { … }
+	
+	    =   开头表示精准匹配
+		~   开头表示区分大小写匹配         以**结尾
+		!~  开头表示区分大小写不匹配       以**结尾
+		~*  开头表示不区分大小写匹配       以**结尾
+		!~* 开头表示不区分大小写不匹配     以**结尾
+		^~  开头表示以某个字符串开头匹配   以**开头     
+		\.aa$  表示以.aa结尾
+3.多个location匹配时，选择最长前缀匹配
+	首先精确匹配 =-》其次以xx开头匹配^~-》然后是按文件中顺序的正则匹配-》最后是交给 / 通用匹配。
+************************************************
+***                   页面转发               ***
+************************************************
+1. error_page属性    
+	error_page  404                  /404.html;                        
+	error_page   500 502 503 504     /50x.html;
+用法：当通过proxy_pass转发时,当返回对应的错误码时,会通过error_page找到对应的值,拼接成server_name/值再次请求
+	比如：当返回错误码为500时,对应的是/50x.html,通过域名/50x.html,再次请求,找到对应的local进行匹配
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+1.重启服务   systemctl reboot -i

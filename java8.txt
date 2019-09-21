@@ -1,0 +1,32 @@
+1.Lambada表达式
+() -> {}
+左侧表示参数,
+()表示无参,
+(x)表示一个参,
+(x,y)表示两个参,
+右侧表示函数体，具体的逻辑写在{}里,只有一行时可以省略
+
+2.函数式接口(像Runnable和Comparator这样只有一个方法的接口，称为函数式接口。也可以在接口上加上@FunctionalInterface注解，如果编译通过，则该接口就是函数式接口。lambda表达式就需要函数式接口的支持。)
+java8为我们提供了四种函数式接口
+Consumer<T>：消费型接口(void accept(T t))，接收一个参数，无返回值。
+Supplier<T>：供给型接口(T get())，无参数，有返回值。
+Function<T,R>：函数型接口(R apply(T t))，接收一个参数，有返回值。
+Predicate<T>：断言型接口(boolean test(T t))，接收一个参数，返回Boolean值。
+
+3.方法引用和构造器引用(可以省略参数传递，只声明函数名称)
+对象::实例方法
+类::静态方法
+类::实例方法
+Comparator<Integer> comparator = (x,y) -> Integer.compare(x,y);
+//因为compare方法已经被Integer实现了，且是静态的，所以这样用就行。
+Comparator<Integer> comparator1 = Integer::compare;
+
+4.Stream API
+
+5.新时间日期API
+
+6.接口中的默认方法和静态方法(如果一个类继承了一个类还实现了一个接口，而且接口中的默认方法和父类中的方法同名，这时采用类优先原则。)
+
+7.Optional类(用于防止空指针)
+
+8.重复注解与类型注解
