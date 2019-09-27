@@ -1,0 +1,108 @@
+1.安装依赖
+	sudo yum install -y yum-utils device-mapper-persistent-data lvm2
+2.添加docker仓库
+	sudo yum-config-manager --add-repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
+3.安装docker-ce(ce是docker的免费版)
+	sudo yum -y install docker-ce
+4.启动docker
+	systemctl start docker
+5.验证docker是否安装成功
+	sudo docker version
+
+
+
+
+1.搜索镜像(name为我们搜索的镜像名,采用模糊搜索)
+	docker search name
+2.查找镜像的版本
+	https://hub.docker.com
+	在官网上查找对应镜像的tags标签查看所有版本
+3.下载指定版本的镜像(不指定版本时下载的是最新版)
+	docker pull name:tag
+	docker pull mysql                  下载mysql最新版
+	docker pull mysql:8.0.17           下载指定版本的mysql
+4.查看本机的镜像
+	docker images
+5.启动镜像(以启动mysql为例)
+	docker run --name mysql8.0.17 -p 3306:3306 -e MYSQL_ROOT_PASSWORD=mysql_root -d mysql:8.0.17
+	--name                                   指定容器的名称
+	-p                                       映射容器的3306端口到服务器的3306端口
+	-e MYSQL_ROOT_PASSWORD                   设置root的初始密码
+	-d                                       指定启动那个镜像,只有一个版本时,可以不写:tag
+6.对外开放服务器3306端口
+	firewall-cmd --zone=public --add-port=3306/tcp --permanent
+	systemctl reload firewalld
+7.mysql数据库中修改外部连接mysql的密码(我们启动容器时的密码为本地连接密码,即来源为localhost时root的密码,此处修改的是来源为%时root的密码)
+	alter user 'root'@'%' identified with mysql_native_password by 'mysql_root';
+	alter user 'root'@'%' identified  by 'mysql_root';                                            同上,可以不指定加密方式
+
+	
+	
+	
+	
+	
+	
+	
+	
+
+
+
+1.查看正在运行的容器
+	docker ps
+2.查看容器与主机的端口映射
+	docker port 容器ID
+3.进入容器
+	docker exec -it mysql /bin/bash
+4.退出容器
+	ctrl + d
+5.关闭容器
+	docker stop id
+	
+************************************************
+***               创建Docker镜像             ***
+************************************************
+1.构建Docker镜像(Docker通过读取Dockerfile中的指令自动生成映像)
+	docker build -t name path
+	-t指定镜像的名字,path表示Dockerfile文件的位置,path的值通常为.表示当前路径
+1.Dockerfile文件
+	FROM <image>:<tag>         指定基础镜像(指的是一个独立的linux系统,docker就是迷你型linux系统),从docker官网找基础镜像,tags不指定表示最新,下面会解释基础镜像
+	MAINTAINER <name>          指定维护者信息
+	RUN <command>              指定镜像执行时的命令,有shell from和exec from(每个RUN都会创建一层新的镜像)
+		RUN指令创建的中间镜像会被缓存，并会在下次构建中使用。如果不想使用这些缓存镜像，可以在构建时指定--no-cache参数，如：docker build --no-cache
+	ADD <src> <dest>           将本地文件上传至容器,tar类型会被解压,tar.gz不会被解压
+	COPY <src> <dest>          同ADD,但不会自动解压,需要进入容器解压
+	CMD                        容器启动时的默认命令,有shell from和exec from
+	ENTRYPOINT                 容器启动时的默认命令,有shell from和exec from
+	LABEL                      用于为镜像添加元数据(可以是描述信息,通过docker inspect查看)
+		LABEL version="1.0" description="这是一个Web服务器" by="IT笔录"
+	ENV                        设置环境变量
+	EXPOSE  <ports>            指定外界交互端口,该命令指的是这些接口可以被外部访问,具体对应到外部主机那个端口在(此解释存在疑问)  docker run 时用参数 -p指定
+	VOLUME ["path"]            用于指定持久化目录(不懂)
+	WORKDIR path               容器的工作目录,上述命令都是在工作目录下执行,启动是可通过参数-w修改
+	USER name:group            指定运行容器时的用户名和组
+	ARG   key=value             指定参数,可以被$name引用
+		ARG指令定义的参数，在docker build命令中以--build-arg a_name=a_value形式赋值。
+2.RUN、CMD、ENTRYPOINT的区别
+  RUN:用于指定docker build过程中要运行的命令(用于在基础镜像的环境里执行命令)
+	每条RUN命令都会产生一个新的镜像,如果想在一个镜像里执行多条命令,适用&&拼接
+  CMD:容器启动以后，默认的执行的命令(当命令行没有传参且没有ENTRYPOINT的时候执行)(存在多个CMD,最后一个生效)(推荐使用方式)
+  三种用法
+	CMD ["executable","param1","param2"] (exec form)      表示未在任何shell环境下,使用shell必须加到中括号里,比如：CMD ["/bin/bash", "-c", "echo 'hello cmd!'"]
+	CMD ["param1","param2"] (as default parameters to ENTRYPOINT)
+	CMD command param1 param2 (shell form,default /bin/sh -c)
+
+  ENTRYPOINT:容器启动后真正要执行的命令
+  两种用法
+	ENTRYPOINT ["executable", "param1", "param2"] (exec form, preferred)
+	ENTRYPOINT command param1 param2 (shell form)
+3.CMD、ENTRYPOINT的使用方法(此时ENTRYPOINT使用的exec form)(shell form下run和cmd的参数都不会传进去)
+	当run后面有参数时,将作为ENTRYPOINT的参数(CMD不起作用)
+	当run后面没有参数而CMD有时,将CMD的内容作为ENTRYPOINT的参数
+	我们使用ENTRYPOINT的exec form来设置docker的启动命令,里面存放命令不变的部分,使用CMD设置参数的默认版本,通过run传递具体的参数,不传参数时,使用默认版本
+	    使用ENTRYPOINT的shell form时,只执行ENTRYPOINT后面的语句,因为无法传参
+4.基础镜像
+	scratch是docker提供的空镜像,基础镜像都是引的该镜像,常用的基础镜像为alpine,具体查看如下链接
+	https://blog.csdn.net/wyongqing/article/details/80554742
+5.删除镜像
+	docker rm 容器id
+	docker rmi 镜像id

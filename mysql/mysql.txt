@@ -1,0 +1,18 @@
+************************************************
+*** 使用版本  Linux CentOS 7   redis  5.0.5  ***
+************************************************
+
+
+************************************************
+***                 mysql安装                ***
+************************************************
+1.移除CentOS7默认安装的数据库mariadb
+	yum remove mariadb-libs.x86_64
+2.下载mysql(CentOS是基于Red Hat的)
+	通过官网下载或者使用命令行下载
+	wget https://repo.mysql.com//mysql80-community-release-el7-1.noarch.rpm	
+	rpm -Uvh https://repo.mysql.com//mysql80-community-release-el7-1.noarch.rpm
+	yum install -y mysql-community-server
+3.
+
+	
