@@ -1,0 +1,86 @@
+************************************************
+***               Linux CentOS 7             ***
+************************************************
+
+
+************************************************
+***               相关账户密码               ***
+************************************************
+1.Linux用户账号
+	liufeng  1!2@3#4$ 
+	root     1!2@3#4$
+2.mysql登录账号
+	mysql5.7.27      root  mysql5_root   3307
+	mysql8.0.17      root  mysql8_root   3306
+
+************************************************
+***               网络、防火墙配置           ***
+************************************************
+2.CentOS7安装后默认的ens33网卡并不能联网,需要我们进行配置
+	查看本机网卡情况,可以看到每个网卡的具体内容
+	ifconfig
+	网卡的设置文件在如下目录中,每台电脑可能有多张网卡,对应的配置文件为ifcfg-name(name为网卡名)
+	/etc/sysconfig/network-scripts
+	修改对应网卡的配置文件,修改如下属性
+	ONBOOT=yes
+	重启网络服务
+	systemctl restart network
+
+
+
+************************************************
+***                   yum配置                ***
+************************************************
+1.yum仓库源配置
+2.yum安装时软件版本选择
+	
+************************************************
+***                  Docker安装              ***
+************************************************
+1.Docker安装(使用root用户)
+	1.安装依赖
+		yum install -y yum-utils device-mapper-persistent-data lvm2
+	2.添加docker仓库
+		yum-config-manager --add-repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
+	3.安装docker-ce(ce是docker的免费版)
+		yum -y install docker-ce
+	4.启动docker
+		systemctl start docker
+	5.关闭docker
+		systemctl stop docker
+		
+************************************************
+***                  MySQL安装               ***
+************************************************	
+1.MySQL安装(8.0.17版本和5.7.27版本)
+	5.7.27版本
+	docker pull mysql:5.7.27(下载5.7.27的镜像)
+	docker run --name mysql5.7.27 -p 3307:3306 -e MYSQL_ROOT_PASSWORD=mysql5_root -d mysql:5.7.27(启动mysql5的镜像,生成一个容器,每次执行都会生成一个新的容器)
+	docker exec -it mysql5.7.27 /bin/bash(进入mysql5.7.27容器)
+	alter user 'root'@'%' identified  by 'mysql5_root';(mysql数据库里执行该语句,设置远程登录的用户名和密码)(使用的加密方式是mysql_native_password)
+	firewall-cmd --zone=public --add-port=3307/tcp --permanent(打开服务器端口)
+	systemctl reload firewalld(重新加载firewalld)
+	docker stop mysql5.7.27(关闭mysql5,,stop后跟的是容器的ID或NAME)
+	docker start mysql5.7.27(打开mysql5,,start后跟的是容器的ID或NAME)
+	===========================================================================
+	8.0.17版本
+	docker pull mysql:8.0.17(下载8.0.17的镜像)
+	docker run --name mysql8.0.17 -p 3306:3306 -e MYSQL_ROOT_PASSWORD=mysql8_root -d mysql:8.0.17(启动mysql8的镜像)
+	docker exec -it mysql8.0.17 /bin/bash(进入mysql8.0.17容器)
+	alter user 'root'@'%' identified  by 'mysql8_root';(mysql数据库里执行该语句,设置远程登录的用户名和密码)(使用的加密方式是caching_sha2_password)(native低版本使用的mysql_native_password加密,当连接mysql8时会报1251,此时可以升级native驱动)
+	alter user 'root'@'%' identified  WITH mysql_native_password by 'mysql8_root';(指定加密的规则,解决1251问题)
+	firewall-cmd --zone=public --add-port=3306/tcp --permanent(打开服务器端口)
+	systemctl reload firewalld(重新加载firewalld)
+	docker stop mysq8.0.17(关闭mysql8,,stop后跟的是容器的ID或NAME)
+	
+************************************************
+***                  redis安装               ***
+************************************************
+1.redis安装
+	docker pull redis:5.0.6(下载5.0.6的镜像)
+	docker run -p 6379:6379 --name redis -v redis.conf:/usr/local/redis/redis.conf  -v /root/redis/data:/data -d redis:5.0.6 redis-server /usr/local/redis/redis.conf(指定配置文件启动redis)(-v是挂载---->宿主机:容器)(启动配置文件指的是容器内的)
+2.redis具体配置见redis总结
+	
+
+	
+	

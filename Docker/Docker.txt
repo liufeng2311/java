@@ -64,7 +64,7 @@
 1.构建Docker镜像(Docker通过读取Dockerfile中的指令自动生成映像)
 	docker build -t name path
 	-t指定镜像的名字,path表示Dockerfile文件的位置,path的值通常为.表示当前路径
-1.Dockerfile文件
+1.Dockerfile文件(挂载和传输的左侧都是宿主机,右边是容器)
 	FROM <image>:<tag>         指定基础镜像(指的是一个独立的linux系统,docker就是迷你型linux系统),从docker官网找基础镜像,tags不指定表示最新,下面会解释基础镜像
 	MAINTAINER <name>          指定维护者信息
 	RUN <command>              指定镜像执行时的命令,有shell from和exec from(每个RUN都会创建一层新的镜像)
