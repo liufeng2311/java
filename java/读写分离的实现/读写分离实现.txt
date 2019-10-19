@@ -1,0 +1,32 @@
+spring:
+  datasource:
+    master:
+      driver-class-name: com.mysql.jdbc.Driver
+      jdbc-url: jdbc:mysql://192.168.64.136:3307/liufeng?useUnicode=true&characterEncoding=UTF8&zeroDateTimeBehavior=convertToNull&autoReconnect=true&useSSL=false
+      password: liufeng
+      username: root
+    slave1:
+      driver-class-name: com.mysql.jdbc.Driver
+      jdbc-url: jdbc:mysql://192.168.64.132:3307/liufeng?useUnicode=true&characterEncoding=UTF8&zeroDateTimeBehavior=convertToNull&autoReconnect=true&useSSL=false&serverTimezone=UTC
+      password: liufeng
+      username: root
+注意点：
+	1.url------>jdbc-url(配置多数据原时,要使用jdbc-url)
+	2.url常用属性解释
+	  useUnicode=true&characterEncoding=UTF8    useUnicode=true表示使用字符集,characterEncoding=UTF8表示系统字符集的类型(),该设置的作用是将传输给数据库的数据按此字符集先解码,在按数据库存储类型编码存入
+	  zeroDateTimeBehavior=convertToNull        表示将数据库错误日期数据映射到实体类时,将值设为NULL,不设置该属性会抛出异常,比如数据库0000-00-00 00:00:00映射到实体类中
+	  autoReconnect=true                        连接断开后是否重新连接
+	  serverTimezone=Asia/Shanghai              UTC代表的是全球标准时间,设置为UTC时,数据库里显示的时间与北京时间存在八小时时差,使用程序取出时不存在时差,我们设置为Asia/Shanghai,使数据库保持显示同步(mysql8以上版本才存在该问题以下版本不用设置)
+	  useSSL=false                              指定是否使用SSL连接,设置为false即可
+	3.mysql8驱动不同,为
+		com.mysql.cj.jdbc.Driver
+		
+事务：经过测试发现多个数据库都可以实现回滚
+
+事务不生效的原因：
+	1.mysql表必须支持事务：引擎为INNODB
+	2.方法上加注解@Transactional//默认只对RuntimeException起作用,可修改(通过参数rollbackFor指定异常的类型)
+	3.方法用public修饰
+	4.同类中二级方法不会生效(因为同类中不会触发AOP)
+		
+

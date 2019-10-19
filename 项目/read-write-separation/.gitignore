@@ -1,0 +1,27 @@
+# Created by .ignore support plugin (hsz.mobi)
+### Example user template template
+### Example user template
+
+# IntelliJ project files
+.idea
+*.iml
+out
+gen
+logs
+logs/*.log
+tc-client/logs
+tc-client/logs/*.log
+tc-message/logs
+tc-message/logs/*.log
+tc-source/logs
+tc-source/logs/*.log
+/tc-client/.settings/org.springframework.ide.eclipse.prefs
+.apt_generated
+.apt_generated_tests
+.settings
+.classpath
+.factorypath
+hs_err_pid12668.log
+.project
+/target/
+target/

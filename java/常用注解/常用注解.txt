@@ -1,0 +1,9 @@
+1.@Configuration
+	相等于xml文件中的<beans><beans/>标签,其本质还是@Component,用于生成实例
+2.@Bean
+	相等于xml文件中的<bean></bean>标签,必须和@Configuration配合使用,用于生成实例,作用在方法上,生成的实例id为方法名,
+	当存在多个同类型的实例时,此时就需要通过@Resource指定id引用,而不是通过@Autowired引用
+3.@ConfigurationProperties(value = "spring.datasource.master")
+	生成配置类时,指定实体类属性在配置文件中的前缀
+4.@Primary
+	spring注入时默认是按照类型注入的,当同一类型存在多个实例时,用该注解指定要采用的实例

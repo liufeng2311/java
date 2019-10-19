@@ -1,0 +1,2 @@
+1.查看当前数据库连接情况
+	SHOW FULL processlist;

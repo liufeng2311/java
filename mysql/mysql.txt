@@ -15,4 +15,52 @@
 	yum install -y mysql-community-server
 3.
 
+************************************************
+***                 mysql权限                ***
+************************************************
+
+
+
+************************************************
+***                 mysql主从复制             ***
+************************************************
+1.设置复制权限
+	grant replication slave on *.* to 'root'@'%' identified by 'liufeng';
+2.查看master信息(如果返回值为空,可能是因为未开启日志)
+	show master status;
+	File字段表示的日志文件名,对应slave中的master_log_file
+	Position字段表示的文件位置,对应slave中的master_log_pos
+3.查看log_bin日志是否开启
+	show variables like 'log_bin';
+4.开启log_bin(等号左边右边为日志文件的名字)
+	配置文件[mysqlId]下添加
+	log-bin=mysql-bin
+	server-id=1(开启log-bin时,必须设置该参数,值随意,区分主库和从库)
+5.Docker中没有vim,需要我们安装
+	配置国内数据源
+	mv /etc/apt/sources.list /etc/apt/sources.list.bak
+    echo "deb http://mirrors.163.com/debian/ jessie main non-free contrib" >> /etc/apt/sources.list
+    echo "deb http://mirrors.163.com/debian/ jessie-proposed-updates main non-free contrib" >>/etc/apt/sources.list
+    echo "deb-src http://mirrors.163.com/debian/ jessie main non-free contrib" >>/etc/apt/sources.list
+    echo "deb-src http://mirrors.163.com/debian/ jessie-proposed-updates main non-free contrib" >>/etc/apt/sources.list
+	更新数据源
+	apt-get update
+	安装vim
+	apt-get install vim
+6.重启mysql容器，查看master信息
+7.从服务器配置
+	change master to master_host='192.168.64.136',master_port=3307,master_user='root',master_password='liufeng', master_log_file='mysql-bin.000002',master_log_pos=154;
+8.查看从服务器状态
+	show slave status\G(不已分号结尾)
+9.启动同步
+	start slave;
+	表示同时启动I/O 线程和SQL线程。
+	I/O线程从主库读取bin log，并存储到relay log中继日志文件中。
+	SQL线程读取中继日志，解析后，在从库重放。
+10.关闭同步
+	stop slave;
+11.设置从数据库为只读
+	执行sql    set global read_only=1;    #1是只读，0是读写
+	配置文件[mysqlId]下添加read_only=1
+	
 	
