@@ -20,9 +20,8 @@ public class UserController {
 	@Autowired
 	UserMapper mapper;
 	
-	@Read
+	@Read(name = "刘峰")
 	@RequestMapping("master")
-	@Transactional()
 	public void master(){
 		User user = new User();
 		user.setIsLogin("1");
@@ -30,7 +29,6 @@ public class UserController {
 		user.setPassword("123456");
 		user.setLoginTime(new Date());
 		mapper.insert(user);
-		int a = 1/0;
 	}
 	
 	@Read
@@ -58,7 +56,6 @@ public class UserController {
 		user.setPassword("123456");
 		user.setLoginTime(new Date());
 		mapper.insert(user);
-		int a = 1/0;
 	}
 	
 	@Write

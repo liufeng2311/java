@@ -56,18 +56,7 @@ public class DataSourceConfig {
 
 	//设置事务,测试发现不配置多个数据源也可以回滚,如果是读写分离,此处直接指定为主库的数据源
 	@Bean
-	@Primary
 	public DataSourceTransactionManager platformTransactionManager(DataSource dataSource) {
-		return new DataSourceTransactionManager(dataSource);
-	}
-	
-	//也可以通过为每个数据源配置事务, 通过使用@Transactional("master")指定
-	@Bean
-	public DataSourceTransactionManager master(@Qualifier("master")DataSource dataSource) {
-		return new DataSourceTransactionManager(dataSource);
-	}
-	@Bean
-	public DataSourceTransactionManager slave(@Qualifier("slave")DataSource dataSource) {
 		return new DataSourceTransactionManager(dataSource);
 	}
 }
