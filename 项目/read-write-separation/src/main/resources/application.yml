@@ -1,5 +1,3 @@
-mybatis:
-  mapperLocations: classpath*:mapper/*.xml
 server:
   port: 9002
 spring:
@@ -19,3 +17,22 @@ spring:
       jdbc-url: jdbc:mysql://192.168.64.133:3306/liufeng?useUnicode=true&characterEncoding=UTF8&zeroDateTimeBehavior=convertToNull&autoReconnect=true&useSSL=false
       password: liufeng
       username: root
+    type: com.zaxxer.hikari.HikariDataSource
+    hikari:
+      minimum-idle: 5
+      maximum-pool-size: 15
+      connection-test-query: SELECT 1
+      max-lifetime: 1800000
+      connection-timeout: 30000
+      pool-name: DatebookHikariCP
+
+#配置日志
+logging:
+  level: 
+   com.beiming.dao: debug 
+   com.beiming.common.aspect: debug
+#   file: classpath*:log/logger.log
+
+#配置mybatis
+mybatis:
+  mapperLocations: classpath*:mapper/*.xml

@@ -7,7 +7,7 @@ import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
 import com.beiming.common.enums.DataSourceTypeEnum;
 
 /**
- * 通过该类实现动态获取数据库
+ * 动态数据源配置
  *	
  */
 public class TargerDataSource extends AbstractRoutingDataSource{
@@ -25,7 +25,7 @@ public class TargerDataSource extends AbstractRoutingDataSource{
     	target.set(DataSourceTypeEnum.MASTER);
     }
     
-    //设置读库,并简单实现负载均衡
+    //设置读库,通过数据数简单实现负载均衡
     public static void slave() {
         int index = counter.getAndIncrement() % 2;
         if (counter.get() > 9999) {

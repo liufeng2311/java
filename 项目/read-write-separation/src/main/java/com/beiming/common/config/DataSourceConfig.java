@@ -1,8 +1,11 @@
 package com.beiming.common.config;
 
-
+/**
+ * 数据库配置文件
+ */
 import java.util.HashMap;
 import java.util.Map;
+
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -12,8 +15,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.beiming.common.enums.DataSourceTypeEnum;
 import com.beiming.datasource.TargerDataSource;

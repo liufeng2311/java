@@ -1,76 +1,41 @@
 package com.beiming.controller;
 
-import java.util.Date;
-import java.util.List;
+import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.beiming.common.annotation.Read;
-import com.beiming.common.annotation.Write;
-import com.beiming.dao.UserMapper;
-import com.beiming.entity.User;
+import com.beiming.common.utils.ResultModel;
+import com.beiming.dto.request.RegisterUserDTO;
+import com.beiming.service.UserService;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 
 @RequestMapping("user")
-@RestController
+@RestController                                                     //@RestController = @Controller+@ResponseBody,@ResponseBody表示返回值是对象,如果没有的话,会把返回值作为页面解析,出现404的问题
+@Api(tags = "用户信息相关接口")
 public class UserController {
 	
 	@Autowired
-	UserMapper mapper;
+	UserService userService;
 	
-	@Read(name = "刘峰")
-	@RequestMapping("master")
-	public void master(){
-		User user = new User();
-		user.setIsLogin("1");
-		user.setName("liufeng");
-		user.setPassword("123456");
-		user.setLoginTime(new Date());
-		mapper.insert(user);
-	}
-	
+	@PostMapping("register")
+	@ApiOperation(value = "用户注册")
 	@Read
-	@RequestMapping("master1")
-	public void master1() {
-		User user = new User();
-		user.setIsLogin("1");
-		user.setName("liufeng");
-		user.setPassword("123456");
-		user.setLoginTime(new Date());
-		List<User> selectAll = mapper.selectAll();
-		for(User var : selectAll) {
-			String string = var.toString();
-			System.out.println(string);
-		}
+	public ResultModel registerUser(@RequestBody @Valid RegisterUserDTO user) {
+		userService.register(user);
+		return ResultModel.success();
 	}
 	
-	@Write
-	@RequestMapping("slave")
-	@Transactional
-	public void slave(){
-		User user = new User();
-		user.setIsLogin("1");
-		user.setName("liufeng");
-		user.setPassword("123456");
-		user.setLoginTime(new Date());
-		mapper.insert(user);
+	@GetMapping("register1")
+	@Read
+	public ResultModel registerUser1() {
+		return ResultModel.success();
 	}
-	
-	@Write
-	@RequestMapping("slave1")
-	public void slave1() {
-		User user = new User();
-		user.setIsLogin("1");
-		user.setName("liufeng");
-		user.setPassword("123456");
-		user.setLoginTime(new Date());
-		List<User> selectAll = mapper.selectAll();
-		for(User var : selectAll) {
-			String string = var.toString();
-			System.out.println(string);
-		}
-	}
-
 }
