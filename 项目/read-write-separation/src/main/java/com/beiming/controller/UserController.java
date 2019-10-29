@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.beiming.common.annotation.Read;
+import com.beiming.common.async.AsyncTask;
 import com.beiming.common.utils.ResultModel;
 import com.beiming.dto.request.RegisterUserDTO;
 import com.beiming.service.UserService;
@@ -25,11 +26,15 @@ public class UserController {
 	@Autowired
 	UserService userService;
 	
+	@Autowired
+	AsyncTask asyncTask; 
+	
 	@PostMapping("register")
 	@ApiOperation(value = "用户注册")
 	@Read
 	public ResultModel registerUser(@RequestBody @Valid RegisterUserDTO user) {
 		userService.register(user);
+		asyncTask.asyncTest();
 		return ResultModel.success();
 	}
 	
