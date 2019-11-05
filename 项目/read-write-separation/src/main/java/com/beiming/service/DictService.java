@@ -1,5 +1,5 @@
 package com.beiming.service;
 
-public interface LoggerService {
+public interface DictService {
 
 }

@@ -19,7 +19,7 @@ import com.alibaba.fastjson.JSON;
 import com.beiming.common.utils.DateUtils;
 import com.beiming.common.utils.IPUtils;
 import com.beiming.entity.log.LogInfo;
-import com.beiming.service.LoggerService;
+import com.beiming.service.DictService;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -28,11 +28,11 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Aspect
 @Component
-@Slf4j
+@Slf4j         //Slf4j   ----> Simple Logging Facade For Java，是接口的框架定义
 public class RequestLogAspect {
 	
 	@Autowired
-	LoggerService loggerService;
+	DictService loggerService;
 	
 	@Pointcut("execution(* com.beiming.controller..*.*(..))")  //拦截controller里的所有接口
 	public void requestLog() {
@@ -56,5 +56,6 @@ public class RequestLogAspect {
 		info.setUrl(request.getRequestURL().toString()); //获取URL
 		info.setUseTime(Duration.between(start, end).toMillis()); //获取接口执行时间
 		log.debug("接口调用:{}",	JSON.toJSONString(info));
+		System.out.println(log.getClass());
 	}
 }

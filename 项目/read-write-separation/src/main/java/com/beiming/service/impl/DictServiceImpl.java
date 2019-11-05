@@ -2,9 +2,9 @@ package com.beiming.service.impl;
 
 import org.springframework.stereotype.Service;
 
-import com.beiming.service.LoggerService;
+import com.beiming.service.DictService;
 
 @Service
-public class LoggerServiceImpl implements LoggerService{
+public class DictServiceImpl implements DictService{
 
 }

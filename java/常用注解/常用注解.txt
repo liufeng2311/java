@@ -7,3 +7,8 @@
 	生成配置类时,指定实体类属性在配置文件中的前缀
 4.@Primary
 	spring注入时默认是按照类型注入的,当同一类型存在多个实例时,用该注解指定要采用的实例
+5.@Import
+	在Springboot中配置都一般都是自动导入的，所以我们不需要使用@Import，当我们引入第三方jar包里的文件
+	但是如果如果你自动扫包路径为:com.spring.example.app,而你想导入的配置类在com.spring.example.config下 ，那么该配置类就需要使用@Import导入
+6.@EnableConfigurationProperties
+	使@ConfigurationProperties 注解的类生效,引入第三方jar时,配置文件可能没被注入,使用该注解轻质注入
